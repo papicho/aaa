@@ -87,12 +87,16 @@ const UsersList = props => (
 const UsersEdit = props => (
   <Edit {...props}>
     <SimpleForm>
+<br/>
+    <div source="id">{props.id}</div>
+
       <TextInput source="email" />
       <TextInput source="school" />
       <SelectInput source="role" choices={[
     { id: 'STAFF', name: 'Staff' },
     { id: 'STUDENT', name: 'Student' },
 ]} />
+<Demo />
 
     </SimpleForm>
   </Edit>

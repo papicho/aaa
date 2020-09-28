@@ -6,8 +6,11 @@ import {
   TextField,
   ArrayField,
   ArrayInput,
+  NumberInput,
   Edit,
   SimpleForm,
+  SimpleFormIterator,
+  DateInput,
   TextInput,
   Create
 } from "react-admin";
@@ -24,7 +27,7 @@ const CheckpointsActiveField = props => {
 };
 
 const CheckpointsList = props => (
-  
+
   <List {...props} >
     <Datagrid rowClick="edit" title="Post edition">
       <TextField source="name" />
@@ -43,17 +46,31 @@ const CheckpointsList = props => (
 //<BooleanInput source="active" />
 const CheckpointsEdit = props => (
   <Edit {...props}>
-    <SimpleForm>
-      <TextInput source="name" />
-      <TextInput source="building" />
-      <TextInput source="checkpointType" />
-      <TextInput source="floor" />
-      <TextInput source="school" />
-      <TextInput source="country" />
-      <TextInput source="city" />
-      <TextInput source="neighbors" />
-      <CheckpointsActiveField />
-    </SimpleForm>
+      <SimpleForm>
+      <div source="id">{props.id}</div>
+        <TextInput source="name" />
+        <TextInput source="building" />
+        <TextInput source="checkpointType" />
+        <NumberInput source="floor" />
+
+          <TextInput source="location.country" />
+          <TextInput source="location.city" />
+          <TextInput source="location.school" />
+
+
+
+
+
+
+        <ArrayInput source="neighbors">
+      <SimpleFormIterator>
+          <TextInput source="_id" />
+          <TextInput source="name" />
+          <TextInput source="cost" />
+          <TextInput source="direction" />
+      </SimpleFormIterator>
+  </ArrayInput>
+      </SimpleForm>
   </Edit>
 );
 
@@ -63,11 +80,25 @@ const CheckpointsCreate = props => (
       <TextInput source="name" />
       <TextInput source="building" />
       <TextInput source="checkpointType" />
-      <TextInput source="floor" />
-      <TextInput source="school" />
-      <TextInput source="country" />
-      <TextInput source="city" />
-      <TextInput source="neighbors" />
+      <NumberInput source="floor" />
+
+        <TextInput source="location.country" />
+        <TextInput source="location.city" />
+        <TextInput source="location.school" />
+
+
+
+
+
+
+      <ArrayInput source="neighbors">
+    <SimpleFormIterator>
+        <TextInput source="_id" />
+        <TextInput source="name" />
+        <TextInput source="cost" />
+        <TextInput source="direction" />
+    </SimpleFormIterator>
+</ArrayInput>
     </SimpleForm>
   </Create>
 );
@@ -86,3 +117,6 @@ const Checkpoints = {
 };
 
 export default Checkpoints;
+//<TextInput source="country" />
+//<TextInput source="city" />
+//<TextInput source="school" />
