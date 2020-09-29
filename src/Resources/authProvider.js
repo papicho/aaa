@@ -3,13 +3,13 @@
 export default {
     // called when the user attempts to log in
     login: async ({ username, password }) => {
-      localStorage.setItem('username', username);
 
         const request = new Request('https://findar-api-staging.herokuapp.com/user/login', {
             method: 'POST',
             body: JSON.stringify({ email: username, password }),
             headers: new Headers({ 'Content-Type': 'application/json' }),
         });
+        localStorage.setItem('username', username);
 
         console.log(username);
         console.log(password);

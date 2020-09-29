@@ -8,17 +8,17 @@ import dataProvider from './dataProvider';
 const dataProviderWrapper = {
   getList: (resource, params) => {
     console.log("FN =")
-    console.log(localStorage.getItem('username'))
-    var emailUser = localStorage.getItem('username')
-    var userSchool = emailUser.split('.')
-    localStorage.setItem("fn", userSchool[0])
-    var schoolName = userSchool[1].split('@')
-    localStorage.setItem('schoolName', schoolName[1])
-    console.log(schoolName[1])
+    //console.log(localStorage.getItem('username'))
+    //var emailUser = localStorage.getItem('username')
+    //var userSchool = emailUser.split('.')
+    //localStorage.setItem("fn", userSchool[0])
+    //var schoolName = userSchool[1].split('@')
+    //localStorage.setItem('schoolName', schoolName[1])
+    //console.log(schoolName[1])
     console.log(resource)
     console.log("PARAMS ARE : ")
     console.log(params)
-    if (resource == "checkpoint")
+    if (resource === "checkpoint")
     {
         return dataProvider.getList(resource, params).then(result => {
           /**
@@ -30,8 +30,7 @@ const dataProviderWrapper = {
           result.data.forEach(record => {
             console.log("record location school :")
             console.log(record.location.school)
-            if (record.location.school.toLowerCase() == localStorage.getItem('schoolName').toLowerCase()) {
-
+            //if (record.location.school.toLowerCase() == localStorage.getItem('schoolName').toLowerCase()) {
 
             newData.push({
               id: record._id,
@@ -44,7 +43,7 @@ const dataProviderWrapper = {
               country: record.location.country,
               city: record.location.city
             });
-          }
+          //}
 
           });
           console.log(`Data returned from data provider in getList:`);
@@ -52,7 +51,7 @@ const dataProviderWrapper = {
           return { data: newData, total: newData.length };
         });
     }
-    else if (resource == "user")
+    else if (resource === "user")
     {
         return dataProvider.getList(resource, params).then(result => {
           /**
@@ -62,30 +61,59 @@ const dataProviderWrapper = {
            */
           const newData = [];
           result.data.forEach(record => {
-            var tmp = record.school;
-            if (tmp == localStorage.getItem("schoolName").toLowerCase()) {
-            newData.push({
-              id: record._id,
-              email: record.email,
-              school: record.school,
-              role: record.role
-            });
+            let email = localStorage.getItem("username")
+            var name   = email.substring(0, email.lastIndexOf("@"));
+            var domain = email.substring(email.lastIndexOf("@") +1);
+            let fullname = name.split(".")
+            let fn = fullname[0]
+            let ln = fullname[1]
+            let loginSchool0 = domain.split(".")
+            let loginSchool = loginSchool0[0]
+
+            console.log("dans getlist ressource user avec comme loginSchool:")
+            console.log(loginSchool)
+            let tmp = record.school
+            if (tmp)
+            {
+              tmp = tmp.toLowerCase()
+              console.log("dans if recodschool ressource user:")
+
+
+                  //var tmp = record.school
+                //  if (tmp == .toLowerCase()) {
+                let n = tmp.includes(loginSchool);
+                  console.log("dans  NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN")
+                  console.log(tmp)
+
+                  if (n)
+                  {
+                    newData.push({
+                      id: record._id,
+                      email: record.email,
+                      school: record.school,
+                      role: record.role
+                    });
+                  }
+
+
             }
           });
           console.log("ressource =====")
           console.log(resource)
           console.log(`Data returned from data provider in getList:`);
           console.log(JSON.stringify(newData, null, 8));
+
           return { data: newData, total: newData.length };
+
         });
     }
   },
   getMany: (resource, params) => dataProvider.getMany(resource, params),
   updateMany: (resource, params) => dataProvider.updateMany(resource, params),
   create: (resource, params) => {
-    if (resource == "checkpoint")
+    if (resource === "checkpoint")
  {
-    if (params.hasOwnProperty('location')) {console.log("OUAIS ELLE LA LOCATION!!!")}
+    //if (params.hasOwnProperty('location')) {console.log("OUAIS ELLE LA LOCATION!!!")}
       console.log("sa rentre dans create check point avec les params suivant")
       console.log(params)
 
@@ -93,7 +121,7 @@ const dataProviderWrapper = {
    console.log(JSON.stringify(params, null, 8))
 
  }
- else if (resource == "user")
+ else if (resource === "user")
 {
   resource = resource + "/signup"
 }
@@ -136,13 +164,13 @@ const dataProviderWrapper = {
 
     console.log("LES PARAMETRE de GETONE SONT ")
     console.log(params)
-    if (resource == "user" && params.hasOwnProperty('id') )
+    if (resource === "user" && params.hasOwnProperty('id') )
     {  resource = resource + "/profile"  }
-    else if (resource == "checkpoint" && params.hasOwnProperty('id') )
-    {  resource = resource}
+    //else if (resource == "checkpoint" && params.hasOwnProperty('id') )
+    //{  resource = resource}
 
     return dataProvider.getOne(resource, params).then(result => {
-      const location = [];
+
 
       const newData = {
         id: result.data._id,
