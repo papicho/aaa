@@ -29,20 +29,43 @@ const dataProviderWrapper = {
           const newData = [];
           result.data.forEach(record => {
             console.log("record location school :")
-            console.log(record.location.school)
+            let email = localStorage.getItem("username")
+            var name   = email.substring(0, email.lastIndexOf("@"));
+            var domain = email.substring(email.lastIndexOf("@") +1);
+            let fullname = name.split(".")
+            let fn = fullname[0]
+            let ln = fullname[1]
+            let loginSchool0 = domain.split(".")
+            let loginSchool = loginSchool0[0]
+
+            console.log("dans getlist ressource user avec comme loginSchool:")
+            console.log(loginSchool)
+            let tmp = record.location.school.toLowerCase()
+
+            if (tmp)
+            {
+              let n = tmp.includes(loginSchool);
+                console.log("dans  NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN")
+                console.log(tmp)
+
+                if (n)
+                {
+              newData.push({
+                id: record._id,
+                name: record.name,
+                building: record.building,
+                checkpointType: record.checkpointType,
+                floor: record.floor,
+                neighbors: record.neighbors,
+                school: record.location.school,
+                country: record.location.country,
+                city: record.location.city
+              });
+            }
+            }
             //if (record.location.school.toLowerCase() == localStorage.getItem('schoolName').toLowerCase()) {
 
-            newData.push({
-              id: record._id,
-              name: record.name,
-              building: record.building,
-              checkpointType: record.checkpointType,
-              floor: record.floor,
-              neighbors: record.neighbors,
-              school: record.location.school,
-              country: record.location.country,
-              city: record.location.city
-            });
+
           //}
 
           });
