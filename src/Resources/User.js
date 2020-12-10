@@ -17,6 +17,7 @@ import {
   EmailField,
   RichTextField,
   DateField,
+  Filter,
   NumberField,
   BooleanField,
   ReferenceManyField,
@@ -39,6 +40,7 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Demo from './demo';
+import MyPicturesField from './MyPicturesField.js';
 
 import pic from "./unknown.png"
 
@@ -71,13 +73,24 @@ const UsersActiveField = props => {
   return <div>Not Active</div>;
 };
 
+const PostFilter = (props) => (
+    <Filter {...props}>
+        <TextInput label="Search" source="q" alwaysOn />
+        <TextInput label="Title" source="school" defaultValue="Hello, World!" />
+    </Filter>
+);
+
+const schooll = localStorage.getItem("school");
+const school = schooll.charAt(0).toUpperCase() + schooll.slice(1)
+
 const UsersList = props => (
-  <List {...props}>
+  <List {...props} perPage={5} filter={{q: schooll}}>
     <Datagrid rowClick="edit">
       <TextField source="id" />
       <EmailField source="email" />
       <TextField source="role" />
       <TextField source="school" />
+      <MyPicturesField source="userPicture"/>
     </Datagrid>
   </List>
 );
@@ -97,7 +110,9 @@ const UsersEdit = props => (
     { id: 'STUDENT', name: 'Student' },
 ]} />
 <Demo />
-
+<ImageInput source="userPicture" label="Related pictures" accept="image/*">
+  <ImageField source="userPicture" title="title" />
+</ImageInput>
     </SimpleForm>
   </Edit>
 );
@@ -114,7 +129,7 @@ const UsersCreate = props => (
               </Tab>
               <Tab label="Picture" path="body">
               <Avatar src={pic} className={useStyles("large")} />
-              <ImageInput source="pictures" label="Related pictures" accept="image/*">
+              <ImageInput source="userPicture" label="Related pictures" accept="image/*">
                 <ImageField source="src" title="title" />
             </ImageInput>
               </Tab>

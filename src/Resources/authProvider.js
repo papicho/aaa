@@ -10,7 +10,15 @@ export default {
             headers: new Headers({ 'Content-Type': 'application/json' }),
         });
         localStorage.setItem('username', username);
-
+        let email = localStorage.getItem("username")
+        var name   = email.substring(0, email.lastIndexOf("@"));
+        var domain = email.substring(email.lastIndexOf("@") +1);
+        let fullname = name.split(".")
+        let fn = fullname[0]
+        let ln = fullname[1]
+        let loginSchool0 = domain.split(".")
+        let loginSchool = loginSchool0[0]
+        localStorage.setItem('school', loginSchool)
         console.log(username);
         console.log(password);
 

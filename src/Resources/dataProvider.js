@@ -1,13 +1,11 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { Admin, Resource, fetchUtils } from "react-admin";
+import { fetchUtils } from "react-admin";
 import jsonServerProvider from "ra-data-json-server";
 
 
 const httpClient = (url, options = {}) => {
     options.user = {
         authenticated: true,
-        token: 'Bearer ' + localStorage.getItem('token')
+        token: 'Bearer ' + localStorage.getItem('token'),
     };
     console.log(localStorage.getItem('token'))
     return fetchUtils.fetchJson(url, options);

@@ -1,20 +1,67 @@
 import React from "react";
 import {
-  Resource,
   List,
   Datagrid,
   TextField,
-  ArrayField,
-  ArrayInput,
-  NumberInput,
-  Edit,
-  SimpleForm,
-  SimpleFormIterator,
-  DateInput,
+  EditButton,
+  Resource,
   TextInput,
-  Create
+  ArrayField,
+  NumberField,
+  NumberInput,
+  TabbedForm,
+  FormTab,
+  required,
+  //   Edit,
+  Create,
+  Filter,
+  ArrayInput,
+  SimpleFormIterator,
+  minLength,
+  maxLength,
+  minValue,
+  maxValue,
+  number,
+  choices,
+  SelectInput,
+  Edit,
 } from "react-admin";
+
+import ChevronLeft from '@material-ui/icons/ChevronLeft';
+import ChevronRight from '@material-ui/icons/ChevronRight';
+import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
+import MyQRField from './MyQRField.js';
+
+
+let ttl = localStorage.getItem('ttl')
+
+const PostPagination = ({ page, perPage, total, setPage }) => {
+    console.log("TTL");
+    console.log(ttl);
+    const nbPages = Math.ceil(total / perPage) || 1;
+    console.log("nbPAGEEEEEEEEEEEES");
+    console.log(nbPages);
+    console.log("perPAGE");
+    console.log(perPage);
+    console.log("PAGE "+page);
+
+    return (
+        nbPages > 1 &&
+            <Toolbar>
+                {page > 1 &&
+                    <Button color="primary" key="prev" icon={ChevronLeft} onClick={() => setPage(page - 1)}>
+                        Prev
+                    </Button>
+                }
+                {page !== nbPages &&
+                    <Button color="primary" key="next" icon={ChevronRight} onClick={() => setPage(page + 1)} labelPosition="before">
+                        Next
+                    </Button>
+                }
+            </Toolbar>
+    );
+}
 
 const CheckpointsActiveField = props => {
   if (!props.record) {
@@ -26,80 +73,202 @@ const CheckpointsActiveField = props => {
   return <div>Not Active</div>;
 };
 
-const CheckpointsList = props => (
+const schooll = localStorage.getItem("school");
+const school = schooll.charAt(0).toUpperCase() + schooll.slice(1)
 
-  <List {...props} >
-    <Datagrid rowClick="edit" title="Post edition">
-      <TextField source="name" />
-      <TextField source="building" />
-      <TextField source="checkpointType" />
-      <TextField source="floor" />
-      <TextField source="school" />
-      <TextField source="country" />
-      <TextField source="city" />
-      <TextField source="neighbors" />
+const validateName = [required(), minLength(2), maxLength(30)];
+const validateBuilding = [required(), minLength(2), maxLength(30)];
+const validateFloor = [required(), number(), minValue(0), maxValue(99)];
+const validateCheckpointType = choices(
+  ["Salle", "Ascenseur", "Escaliers", "Couloir", "Terrace", "Bureau"],
+  "Type must be Salle, Ascenseur, Escaliers, Couloir, Terrace or Bureau"
+);
+const validateSchool = [required(), minLength(2), maxLength(30)];
+const validateCountry = [required(), minLength(2), maxLength(30)];
+const validateCity = [required(), minLength(2), maxLength(30)];
+const validateCost = [required(), number(), minValue(0), maxValue(50)];
+const validateNeighborDirection = choices(["Gauche", "Droite", "Face", "N/A"]);
+
+const CheckpointTitle = ({ record }) => {
+  return <span>Checkpoint {record ? `"${record.name}"` : ""}</span>;
+};
+
+const CheckpointList = (props) => (
+  <List {...props} filter={{q: school}} perPage={5}>
+    <Datagrid rowClick="edit">
+      {/* ADD expand={<CheckpointPanel />} if needed*/}
+      <MyQRField source="id"/>
+      <TextField source="_id" />
+      <TextField source="name" validate={validateName} />
+      <TextField source="building" validate={validateBuilding} />
+      <NumberField source="floor" validate={validateFloor} />
+      <TextField source="checkpointType" validate={validateCheckpointType} />
+      <TextField
+        source="location.school"
+        label="School"
+        validate={validateSchool}
+      />
+      <TextField
+        source="location.country"
+        label="Country"
+        validate={validateCountry}
+      />
+      <TextField source="location.city" label="City" validate={validateCity} />
+      <ArrayField source="neighbors">
+        <Datagrid>
+          {/* IF NEEDED: ADD <TextField source="_id" label="Checkpoint ID" /> */}
+          <TextField source="name" label="Name" validate={validateName} />
+          <NumberField
+            source="cost"
+            label="Distance(m)"
+            validate={validateCost}
+          />
+          <TextField
+            source="direction"
+            label="Direction"
+            validate={validateNeighborDirection}
+          />
+        </Datagrid>
+      </ArrayField>
+      <EditButton />
     </Datagrid>
   </List>
 );
 
-// add this to Edit below to avoid the problem
-//<BooleanInput source="active" />
-const CheckpointsEdit = props => (
-  <Edit {...props}>
-      <SimpleForm>
-      <div source="id">{props.id}</div>
-        <TextInput source="name" />
-        <TextInput source="building" />
-        <TextInput source="checkpointType" />
-        <NumberInput source="floor" />
-
-          <TextInput source="location.country" />
-          <TextInput source="location.city" />
-          <TextInput source="location.school" />
-
-
-
-
-
-
-        <ArrayInput source="neighbors">
-      <SimpleFormIterator>
-          <TextInput source="_id" />
-          <TextInput source="name" />
-          <TextInput source="cost" />
-          <TextInput source="direction" />
-      </SimpleFormIterator>
-  </ArrayInput>
-      </SimpleForm>
+const CheckpointEdit = (props) => (
+  <Edit title={<CheckpointTitle />} {...props}>
+    <TabbedForm>
+      <FormTab label="Checkpoint">
+        <TextInput disabled source="id" />
+        <TextInput source="name" validate={validateName} />
+        <TextInput source="building" validate={validateBuilding} />
+        <NumberInput source="floor" validate={validateFloor} />
+        <SelectInput
+          label="Checkpoint Type"
+          source="checkpointType"
+          choices={[
+            { id: "Salle", name: "Salle" },
+            { id: "Ascenseur", name: "Ascenseur" },
+            { id: "Escaliers", name: "Escaliers" },
+            { id: "Couloir", name: "Couloir" },
+            { id: "Terrace", name: "Terrace" },
+            { id: "Bureau", name: "Bureau" },
+          ]}
+          validate={validateCheckpointType}
+        />
+        <TextInput
+          source="location.school"
+          label="School"
+          validate={validateSchool}
+        />
+        <TextInput
+          source="location.country"
+          label="Country"
+          validate={validateCountry}
+        />
+        <TextInput
+          source="location.city"
+          label="City"
+          validate={validateCity}
+        />
+      </FormTab>
+      <FormTab label="Neighbors">
+        <ArrayInput source="neighbors" label="Edit neighbors">
+          <SimpleFormIterator>
+            <TextInput source="_id" label="Neighbor's ID" />
+            <TextInput
+              source="name"
+              label="Neighbor's name"
+              validate={validateName}
+            />
+            <NumberInput
+              source="cost"
+              label="Distance to neighbor"
+              validate={validateCost}
+            />
+            <SelectInput
+              label="Direction to neighbor"
+              source="direction"
+              choices={[
+                { id: "Gauche", name: "Gauche" },
+                { id: "Droite", name: "Droite" },
+                { id: "Face", name: "Face" },
+                { id: "N/A", name: "N/A" },
+              ]}
+              validate={validateNeighborDirection}
+            />
+          </SimpleFormIterator>
+        </ArrayInput>
+      </FormTab>
+    </TabbedForm>
   </Edit>
 );
 
-const CheckpointsCreate = props => (
+const CheckpointCreate = (props) => (
   <Create {...props}>
-    <SimpleForm>
-      <TextInput source="name" />
-      <TextInput source="building" />
-      <TextInput source="checkpointType" />
-      <NumberInput source="floor" />
-
-        <TextInput source="location.country" />
-        <TextInput source="location.city" />
-        <TextInput source="location.school" />
-
-
-
-
-
-
-      <ArrayInput source="neighbors">
-    <SimpleFormIterator>
-        <TextInput source="_id" />
-        <TextInput source="name" />
-        <TextInput source="cost" />
-        <TextInput source="direction" />
-    </SimpleFormIterator>
-</ArrayInput>
-    </SimpleForm>
+    <TabbedForm redirect="list">
+      <FormTab label="Checkpoint">
+        <TextInput source="name" validate={validateName} />
+        <TextInput source="building" validate={validateBuilding} />
+        <NumberInput source="floor" validate={validateFloor} />
+        <SelectInput
+          label="Checkpoint Type"
+          source="checkpointType"
+          choices={[
+            { id: "Salle", name: "Salle" },
+            { id: "Ascenseur", name: "Ascenseur" },
+            { id: "Escaliers", name: "Escaliers" },
+            { id: "Couloir", name: "Couloir" },
+            { id: "Terrace", name: "Terrace" },
+            { id: "Bureau", name: "Bureau" },
+          ]}
+          validate={validateCheckpointType}
+        />
+        <TextInput
+          source="location.school"
+          label="School"
+          validate={validateSchool}
+        />
+        <TextInput
+          source="location.country"
+          label="Country"
+          validate={validateCountry}
+        />
+        <TextInput
+          source="location.city"
+          label="City"
+          validate={validateCity}
+        />
+      </FormTab>
+      <FormTab label="Neighbors">
+        <ArrayInput source="neighbors" label="Add neighbors">
+          <SimpleFormIterator>
+            <TextInput source="_id" label="Neighbor's ID" />
+            <TextInput
+              source="name"
+              label="Neighbor's name"
+              validate={validateName}
+            />
+            <NumberInput
+              source="cost"
+              label="Distance to neighbor"
+              validate={validateCost}
+            />
+            <SelectInput
+              label="Direction to neighbor"
+              source="direction"
+              choices={[
+                { id: "Gauche", name: "Gauche" },
+                { id: "Droite", name: "Droite" },
+                { id: "Face", name: "Face" },
+                { id: "N/A", name: "N/A" },
+              ]}
+              validate={validateNeighborDirection}
+            />
+          </SimpleFormIterator>
+        </ArrayInput>
+      </FormTab>
+    </TabbedForm>
   </Create>
 );
 
@@ -108,15 +277,11 @@ const Checkpoints = {
   resource: (
     <Resource
       name="checkpoint"
-      list={CheckpointsList}
-      edit={CheckpointsEdit}
-      create={CheckpointsCreate}
+      list={CheckpointList}
+      edit={CheckpointEdit}
+      create={CheckpointCreate}
       options={{ label: "Checkpoints" }}
     />
   )
 };
-
 export default Checkpoints;
-//<TextInput source="country" />
-//<TextInput source="city" />
-//<TextInput source="school" />
